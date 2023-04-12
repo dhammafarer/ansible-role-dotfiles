@@ -1,0 +1,34 @@
+---
+- name: Ensure dotfiles repository is cloned locally.
+  ansible.builtin.git:
+    repo: "{{ dotfiles_repo }}"
+    dest: "{{ dotfiles_repo_local_dest }}"
+    version: "{{ dotfiles_repo_version }}"
+    accept_hostkey: "{{ dotfiles_repo_accept_hostkey }}"
+
+- name: Ensure all configured dotfiles are links.
+  ansible.builtin.command:
+    cmd: "ls -F {{ dotfiles_home }}/.{{ item }}"
+  loop: "{{ dotfiles_files }}"
+  changed_when: false
+  check_mode: false
+  failed_when: false
+  register: existing_dotfiles_info
+
+- name: Remove existing file if a replacement is being linked.
+  ansible.builtin.file:
+    path: "{{ dotfiles_home }}/.{{ dotfiles_files[index] }}"
+    state: absent
+  when: "'@' not in item['stdout']"
+  loop: "{{ existing_dotfiles_info.results }}"
+  loop_control:
+    index_var: index
+
+- name: Link dotfiles.
+  ansible.builtin.file:
+    src: "{{ dotfiles_repo_local_dest }}/{{ item }}"
+    dest: "{{ dotfiles_home }}/.{{ item }}"
+    state: link
+    mode: "0644"
+  loop: "{{ dotfiles_files }}"
+  become: false

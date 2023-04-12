@@ -1,0 +1,14 @@
+---
+dotfiles_repo: https://github.com/dhammafarer/dotfiles-box-arch
+dotfiles_repo_local_dest: ~/dotfiles-box-arch
+dotfiles_repo_version: main
+dotfiles_repo_accept_hostkey: false
+
+dotfiles_home: "~"
+
+dotfiles_files:
+  - aliases
+  - gitconfig
+  - gitignore
+  - npmrc
+  - zshrc
